@@ -15,6 +15,7 @@ app.engine(
     "hbs",
     expressHandleBars.engine({
         layoutsDir: __dirname + "/views/layouts",
+        partialsDir: __dirname + "/views/partials",
         extname: "hbs",
         defaultLayout: "layout",
         runtimeOptions: {
@@ -24,9 +25,8 @@ app.engine(
 );
 
 app.set("view engine", "hbs");
+
 app.use(cors(corsOptions));
-
-
 
 // parse requests of content-type - application/json
 app.use(express.json());
@@ -37,8 +37,8 @@ app.use(express.urlencoded({ extended: true }));
 const rootRoute = require("./route/root");
 const detailRoute = require("./route/detail");
 
-app.get("/", rootRoute);
-app.get("/detail", detailRoute);
+app.use("/", rootRoute);
+app.use("/detail", detailRoute);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {

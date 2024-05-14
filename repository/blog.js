@@ -1,5 +1,4 @@
-import {getSequelize} from "./sequelize";
-const models = require("../models");
+const db = require("../models");
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
@@ -11,19 +10,32 @@ const buildGetBlogDetailQuery = () => {
                                         on "Tags".id = "BlogTags"."tagId"
                           group by "blogId"
                           order by "blogId")
-        select title, "Blogs"."imagePath" as imagePath, "Blogs".description as description, "Users"."firstName" as author, "Users"."imagePath" as authorImage, tags
+        select title, "Blogs"."imagePath" as imagePath, "Blogs".description as description, "Blogs".'createdAt' as createdAt, "Users"."firstName" as authorFirstName, "Users"."lastName" as authorLastName, "Users"."imagePath" as authorImage, tags
         from "Blogs"
         join "Categories" on "Blogs"."categoryId" = "Categories".id
         join "Users" on "Users".id = "Blogs"."authorId"
         join BlogTags on BlogTags."blogId" = "Blogs".id
-        where "Blogs".id = $id;
+        where "Blogs".id = $blogId;
     `;
 }
 
 const repo = {
+    GetBlogById: async(id) => {
+        try{
+            const blog = await db['Blog'].findOne({
+                where: {
+                    id
+                },
+            });
+            return blog;
+
+        }catch (error) {
+            console.log('Error in GetBlogById', error);
+            throw error;
+        }
+    },
     GetBlogsSummary : async (limit = 6, offset = 0) => {
         try {
-            const sequelize = await getSequelize();
             return models.Blog.findAll({
                 attributes: [
                     'title',
@@ -49,11 +61,16 @@ const repo = {
         }
     },
     GetBlogDetail: async (id) => {
+        const sequelize = db.sequelize;
         try {
-            return Sequelize.query(buildGetBlogDetailQuery(), {
-                logging: console.log,
-                bind: { id: id },
+            const blogDetail = await db['Blog'].findOne({
+                where: {
+                    id
+                },
+                raw: true,
             });
+
+            return blogDetail;
         } catch (error) {
             console.log('Error in GetBlogDetail', error);
             throw error;
