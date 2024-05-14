@@ -15,14 +15,13 @@ app.engine('hbs', expressHbs.engine({
             return encodeURIComponent(str);
         },
         getURLQuery: function(query, param, value){
-            return '?' + param + '=' + encodeURIComponent(value);
+            return '/?' + param + '=' + encodeURIComponent(value);
         }
     }
 }));
 
 app.set('view engine', 'hbs');
 
-// app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const rootRoute = require("./route/root");

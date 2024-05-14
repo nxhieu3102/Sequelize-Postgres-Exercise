@@ -20,7 +20,6 @@ const repo = {
                 bind: { blogId: id },
                 type: Sequelize.QueryTypes.SELECT
             });
-            console.log('blogTags', blogTags);
             if (blogTags && blogTags.length > 0) {
                 return blogTags[0].tags;
             } else {

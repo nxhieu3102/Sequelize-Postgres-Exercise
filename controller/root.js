@@ -15,7 +15,6 @@ const controller = {
             
             let blogs = await blogRepo.GetBlogsSummary(6, (page - 1) * 6, searchTerm, category, tag);
 
-            console.log(blogs);
             if(blogs && blogs.length > 0) {
                 blogs.forEach(blog => {
                     blog.updatedAt = blog.updatedAt.toISOString().split('T')[0].split('-').reverse().join('-');
