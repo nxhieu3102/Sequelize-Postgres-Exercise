@@ -17,7 +17,11 @@ const repo = {
                 bind: { blogId },
                 type: Sequelize.QueryTypes.SELECT
             });
-            return Categories[0];
+            if (Categories && Categories.length > 0) {
+                return Categories;
+            } else {
+                return [];
+            }
         } catch (error) {
             console.log('Error in GetCategoriesByBlogId', error);
             throw error

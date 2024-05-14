@@ -1,7 +1,4 @@
 const db = require("../models");
-const Sequelize = require("sequelize");
-const Op = Sequelize.Op;
-const blogRepo = require('./blog');
 
 const repo = {
     GetCommentsByBlogId : async (id) => {

@@ -20,7 +20,12 @@ const repo = {
                 bind: { blogId: id },
                 type: Sequelize.QueryTypes.SELECT
             });
-            return blogTags[0].tags;
+            console.log('blogTags', blogTags);
+            if (blogTags && blogTags.length > 0) {
+                return blogTags[0].tags;
+            } else {
+                return [];
+            }
         }catch (error) {
             console.log('Error in GetTagByBlogId', error);
             throw error;
