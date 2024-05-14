@@ -1,46 +1,48 @@
 const express = require("express");
-const cors = require("cors");
 const app = express();
+const path = require('path');
+const expressHbs = require('express-handlebars');
 
-const corsOptions = {
-    origin: "http://localhost:8081"
-};
+app.use(express.static(__dirname + '/html'));
 
-const expressHandleBars = require("express-handlebars");
-
-app.use(express.static(__dirname + "/html/"));
-
-// setting handle bars
-app.engine(
-    "hbs",
-    expressHandleBars.engine({
-        layoutsDir: __dirname + "/views/layouts",
-        partialsDir: __dirname + "/views/partials",
-        extname: "hbs",
-        defaultLayout: "layout",
-        runtimeOptions: {
-            allowProtoPropertiesByDefault: true,
+app.engine('hbs', expressHbs.engine({
+    layoutsDir: path.join(__dirname, 'views', 'layouts'),
+    partialsDir: path.join(__dirname, 'views', 'partials'),
+    defaultLayout: 'layout',
+    extname: 'hbs',
+    helpers: {
+        encodeURI: function(str) {
+            return encodeURIComponent(str);
         },
-    })
-);
+        getURLQuery: function(query, param, value){
+            return '?' + param + '=' + encodeURIComponent(value);
+        }
+    }
+}));
 
-app.set("view engine", "hbs");
+app.set('view engine', 'hbs');
 
-app.use(cors(corsOptions));
-
-// parse requests of content-type - application/json
-app.use(express.json());
-
-// parse requests of content-type - application/x-www-form-urlencoded
+// app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const rootRoute = require("./route/root");
 const detailRoute = require("./route/detail");
 
 app.use("/", rootRoute);
+
 app.use("/detail", detailRoute);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
+});
+
+app.use((req, res, next) => {
+    res.status(404).send('Page not found');
+});
+
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
 });

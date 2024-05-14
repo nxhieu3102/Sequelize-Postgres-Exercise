@@ -19,6 +19,33 @@ const buildGetBlogDetailQuery = () => {
     `;
 }
 
+
+const buildGetSummaryBlog = (searchTerm, category, tag) => {
+    return `
+    SELECT "Blog".*
+    FROM (
+        SELECT
+            "Blog"."title",
+            "Blog"."imagePath",
+            "Blog"."summary",
+            "Blog"."updatedAt",
+            COUNT("comments"."id") AS "commentCount",
+            "Blog"."id" AS "id"
+        FROM "Blogs" AS "Blog"
+        LEFT OUTER JOIN "Comments" AS "comments" ON "Blog"."id" = "comments"."blogId"
+        LEFT JOIN "BlogTags" AS "bt" ON "Blog"."id" = "bt"."blogId"
+        LEFT JOIN "Tags" AS "t" ON "bt"."tagId" = "t"."id"
+        LEFT JOIN "Categories" AS "c" ON "Blog"."categoryId" = "c"."id"
+        WHERE ("Blog"."title" LIKE '%${searchTerm}%' OR "Blog"."summary" LIKE '%${searchTerm}%')
+        ${category ? `AND "c"."name" = '${category}'` : ''}
+        ${tag ? `AND "t"."name" = '${tag}'` : ''}
+        GROUP BY "Blog"."id"
+        ORDER BY "Blog"."title"
+        LIMIT $limit OFFSET $offset
+    ) AS "Blog";
+    `
+}
+
 const repo = {
     GetBlogById: async(id) => {
         try{
@@ -34,31 +61,19 @@ const repo = {
             throw error;
         }
     },
-    GetBlogsSummary : async (limit = 6, offset = 0) => {
+    GetBlogsSummary : async (limit = 6, offset = 0, searchTerm = '', category=null, tag=null) => {
         try {
-            return models.Blog.findAll({
-                attributes: [
-                    'title',
-                    'imagePath',
-                    'summary',
-                    'updatedAt',
-                    [Sequelize.fn('COUNT', Sequelize.col('Comments.id')), 'totalComment']
-                ],
-                include: [
-                    {
-                        model: models.Comment,
-                        required: true
-                    },
-                ],
-                group: ['Blog.id'],
-                limit,
-                offset,
-                raw: true,
+            const sequelize = db.sequelize;
+            const blogs = sequelize.query(buildGetSummaryBlog(searchTerm, category, tag), {
+                bind: {limit, offset},
+                type: Sequelize.QueryTypes.SELECT
             });
-        }catch (error) {
+            
+            return blogs;
+          } catch (error) {
             console.log('Error in GetTotalPerCategory', error);
             throw error;
-        }
+          }
     },
     GetBlogDetail: async (id) => {
         const sequelize = db.sequelize;

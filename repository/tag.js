@@ -20,8 +20,7 @@ const repo = {
                 bind: { blogId: id },
                 type: Sequelize.QueryTypes.SELECT
             });
-            console.log('blogTags', blogTags);
-            return blogTags;
+            return blogTags[0].tags;
         }catch (error) {
             console.log('Error in GetTagByBlogId', error);
             throw error;
@@ -29,7 +28,7 @@ const repo = {
     },
     GetAllTags : async () => {
         try {
-            return models.Tag.findAll({
+            return db['Tag'].findAll({
                 attributes: [
                     'name',
                 ],
