@@ -22,15 +22,6 @@ app.engine('hbs', expressHbs.engine({
         },
         currentPageLessThanTotalPages: function(currentPage, totalPages){
             return currentPage < totalPages;
-        },
-        for: function(from, to, block) {
-            console.log(document.getElementsByClassName('product__pagination blog__pagination'));
-            console.log(block);
-            let accum = '';
-            for(let i = from; i <= to; i++) {
-                accum += block.fn(i);
-            }
-            return accum;
         }
     }
 }));
