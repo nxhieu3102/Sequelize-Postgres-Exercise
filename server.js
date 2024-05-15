@@ -16,6 +16,21 @@ app.engine('hbs', expressHbs.engine({
         },
         getURLQuery: function(query, param, value){
             return '/?' + param + '=' + encodeURIComponent(value);
+        },
+        currentPageGreaterThanOne: function(currentPage){
+            return currentPage > 1;
+        },
+        currentPageLessThanTotalPages: function(currentPage, totalPages){
+            return currentPage < totalPages;
+        },
+        for: function(from, to, block) {
+            console.log(document.getElementsByClassName('product__pagination blog__pagination'));
+            console.log(block);
+            let accum = '';
+            for(let i = from; i <= to; i++) {
+                accum += block.fn(i);
+            }
+            return accum;
         }
     }
 }));
