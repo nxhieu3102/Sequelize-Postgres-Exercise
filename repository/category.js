@@ -9,6 +9,16 @@ const buildQuery = () => {
         where "Blogs".id = $blogId;
     `
 }
+
+const buildQueryGetTotalPerCategory = () => {
+    return`
+        select "Categories".name as name, count(*) as count
+        from "Categories" join "Blogs"
+        on "categoryId" = "Categories".id
+        group by "Categories".name
+    `
+}
+
 const repo = {
     GetCategoriesByBlogId: async (blogId) => {
         try {
@@ -29,13 +39,9 @@ const repo = {
     },
     GetTotalPerCategory : async () => {
         try {
-            const categories = await db['Category'].findAll({
-                attributes: [
-                    'name',
-                    [Sequelize.fn("COUNT", Sequelize.col("*")), "count"],
-                ],
-                group: ["name"],
-                raw: true,
+            const sequelize = db.sequelize;
+            const categories = await sequelize.query(buildQueryGetTotalPerCategory(), {
+                type: Sequelize.QueryTypes.SELECT
             });
             return categories;
         }catch (error) {
