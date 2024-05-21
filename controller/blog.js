@@ -11,7 +11,6 @@ const controller = {
             const comment = await commentRepo.GetCommentsByBlogId(req.params.id);
             const category = await categoryRepo.GetCategoriesByBlogId(req.params.id);
             const categories = await categoryRepo.GetTotalPerCategory();
-
             // add field name for search in categories
             categories.forEach(c => {
                 c.name = c.name;
